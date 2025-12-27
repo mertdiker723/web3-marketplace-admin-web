@@ -10,23 +10,27 @@
               <p class="text-h6 text-grey">Web3 Marketplace</p>
             </div>
 
-            <v-form>
+            <v-form @submit.prevent="handleLogin">
               <input-field
                 type="email"
                 variant="outlined"
-                v-model="userInfo.email"
+                v-model="email"
+                v-bind="emailAttrs"
                 density="comfortable"
                 class="mb-4"
                 placeholder="Email"
                 autocomplete="off"
+                :error-messages="errors.email"
               />
 
               <input-field
                 type="password"
                 variant="outlined"
-                v-model="userInfo.password"
+                v-model="password"
+                v-bind="passwordAttrs"
                 density="comfortable"
                 placeholder="Password"
+                :error-messages="errors.password"
               />
 
               <div class="d-flex justify-space-between align-center mb-3">
@@ -37,20 +41,24 @@
 
               <p class="text-red text-body-1 mb-3">{{ errorMessage }}</p>
               <button-field
+                type="submit"
                 block
                 color="primary"
                 size="large"
                 class="mb-5 text-h6"
-                @click="handleLogin"
+                :disabled="isSubmitting"
               >
-                Login
+                {{ isSubmitting ? 'Loading...' : 'Login' }}
               </button-field>
 
               <div class="text-center">
                 <span class="text-grey text-body-1">Don't have an account? </span>
-                <a href="#" class="text-primary text-decoration-none font-weight-bold text-body-1">
+                <router-link
+                  :to="{ name: RouterEnum.REGISTER as string }"
+                  class="text-primary text-decoration-none font-weight-bold text-body-1"
+                >
                   Register
-                </a>
+                </router-link>
               </div>
             </v-form>
           </v-card>
@@ -61,8 +69,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useForm } from 'vee-validate'
+
+// Schema
+import { loginSchema } from '@/validationSchema/login.schema'
 
 // Enums
 import { RouterEnum } from '@/enums/router.enum'
@@ -70,30 +82,31 @@ import { RouterEnum } from '@/enums/router.enum'
 // Services
 import loginServices from '@/services/login.services'
 
-const userInfo = reactive<{
-  email: string
-  password: string
-}>({
-  email: '',
-  password: '',
-})
-
-const errorMessage = ref('')
-
+// Router
 const router = useRouter()
 
-const handleLogin = async () => {
-  const { data, message, success } = await loginServices.login({
-    email: userInfo.email,
-    password: userInfo.password,
-  })
+// Refs
+const errorMessage = ref('')
+
+const { errors, handleSubmit, defineField, isSubmitting } = useForm({
+  validationSchema: loginSchema,
+})
+
+const [email, emailAttrs] = defineField('email')
+const [password, passwordAttrs] = defineField('password')
+
+const handleLogin = handleSubmit(async (values) => {
+  errorMessage.value = ''
+
+  const { data, message, success } = await loginServices.login(values)
+
   if (!success && !data) {
     errorMessage.value = message
     return
   }
 
   router.push({ name: RouterEnum.HOME })
-}
+})
 </script>
 
 <style scoped lang="scss">

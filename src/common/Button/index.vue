@@ -1,5 +1,6 @@
 <template>
   <v-btn
+    :type="type"
     :block="block"
     :color="color"
     :size="size"
@@ -17,6 +18,7 @@
 
 <script setup lang="ts">
 defineProps<{
+  type?: 'button' | 'submit' | 'reset'
   block?: boolean
   color?: string
   size?: string

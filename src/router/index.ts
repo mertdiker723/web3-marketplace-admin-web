@@ -6,6 +6,7 @@ import { isTokenValid } from '@/utils/userAuthToken'
 
 const Home = () => import('../views/home/index.vue')
 const Login = () => import('../views/login/index.vue')
+const Register = () => import('../views/register/index.vue')
 
 const routes = [
   {
@@ -20,6 +21,12 @@ const routes = [
     component: Login,
     meta: { requiresAuth: false },
   },
+  {
+    path: '/register',
+    name: RouterEnum.REGISTER,
+    component: Register,
+    meta: { requiresAuth: false },
+  },
 ]
 
 const router = createRouter({
@@ -27,7 +34,7 @@ const router = createRouter({
   routes,
 })
 
-const withoutAuthRoutes: RouterEnum[] = [RouterEnum.LOGIN]
+const withoutAuthRoutes: RouterEnum[] = [RouterEnum.LOGIN, RouterEnum.REGISTER]
 
 router.beforeEach((to, _from, next) => {
   const token = localStorage.getItem('token') as string

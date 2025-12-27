@@ -11,14 +11,20 @@
       :density="density"
       :class="inputClass"
       :autocomplete="autocomplete"
-      name="new-unique-name"
-      @input="onInput"
+      :error-messages="errorMessages"
+      :model-value="modelValue"
+      v-bind="$attrs"
+      @update:model-value="onUpdateModelValue"
     />
   </div>
 </template>
 
 <script setup lang="ts">
+defineOptions({
+  inheritAttrs: false,
+})
 defineProps<{
+  modelValue?: string | number
   label?: string
   id?: string
   type?: 'text' | 'password' | 'email' | 'number' | 'date' | 'file' | 'textarea'
@@ -36,11 +42,12 @@ defineProps<{
   containerClass?: string
   placeholder?: string
   autocomplete?: string
+  errorMessages?: string | string[]
 }>()
 
 const emit = defineEmits(['update:modelValue'])
 
-const onInput = (event: Event) => {
-  emit('update:modelValue', (event.target as HTMLInputElement).value)
+const onUpdateModelValue = (value: string | number) => {
+  emit('update:modelValue', value)
 }
 </script>
