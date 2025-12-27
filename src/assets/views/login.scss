@@ -1,0 +1,17 @@
+.login-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #7c9aeb 100%);
+
+  .login-card {
+    max-width: 480px;
+    width: 480px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 600px) {
+    .login-card {
+      width: 90%;
+      max-width: 90%;
+    }
+  }
+}

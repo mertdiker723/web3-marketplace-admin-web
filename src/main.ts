@@ -11,6 +11,7 @@ import '@mdi/font/css/materialdesignicons.css'
 import App from './App.vue'
 import router from './router'
 import Input from './common/Input/index.vue'
+import Button from './common/Button/index.vue'
 
 const vuetify = createVuetify({
   components,
@@ -20,6 +21,7 @@ const vuetify = createVuetify({
 const app = createApp(App)
 
 app.component('input-field', Input)
+app.component('button-field', Button)
 
 app.use(vuetify)
 app.use(createPinia())
