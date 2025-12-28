@@ -9,57 +9,69 @@
               <h2 class="text-h4 font-weight-bold mb-2">Admin Panel</h2>
               <p class="text-h6 text-grey">Web3 Marketplace</p>
             </div>
-            <v-form>
+            <v-form @submit.prevent="handleRegister">
               <input-field
                 type="text"
                 variant="outlined"
-                v-model="userInfo.name"
+                v-model="firstName"
+                v-bind="firstNameAttrs"
                 density="comfortable"
-                class="mb-1"
-                placeholder="Name"
+                class="mb-2"
+                placeholder="First Name"
                 autocomplete="off"
+                :error-messages="errors.firstName"
               />
               <input-field
                 type="text"
                 variant="outlined"
-                v-model="userInfo.username"
+                v-model="lastName"
+                v-bind="lastNameAttrs"
                 density="comfortable"
-                class="mb-1"
-                placeholder="Username"
+                class="mb-2"
+                placeholder="Last Name"
                 autocomplete="off"
+                :error-messages="errors.lastName"
               />
               <input-field
                 type="email"
                 variant="outlined"
-                v-model="userInfo.email"
+                v-model="email"
+                v-bind="emailAttrs"
                 density="comfortable"
-                class="mb-1"
+                class="mb-2"
                 placeholder="Email"
                 autocomplete="off"
+                :error-messages="errors.email"
               />
               <input-field
                 type="password"
                 variant="outlined"
-                v-model="userInfo.password"
+                v-model="password"
+                v-bind="passwordAttrs"
                 density="comfortable"
-                class="mb-1"
+                class="mb-2"
                 placeholder="Password"
+                :error-messages="errors.password"
               />
               <input-field
                 type="password"
                 variant="outlined"
-                v-model="userInfo.confirmPassword"
+                v-model="confirmPassword"
+                v-bind="confirmPasswordAttrs"
                 density="comfortable"
+                class="mb-2"
                 placeholder="Confirm Password"
+                :error-messages="errors.confirmPassword"
               />
               <button-field
                 block
                 color="primary"
                 size="large"
                 class="mb-5 text-h6"
-                @click="handleRegister"
+                type="submit"
+                :disabled="isSubmitting"
               >
-                Register
+                {{ isSubmitting ? 'Loading...' : 'Register' }}
               </button-field>
               <p class="text-red text-body-1">{{ errorMessage }}</p>
               <div class="text-center">
@@ -80,28 +92,46 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
+import { useForm } from 'vee-validate'
+import { useRouter } from 'vue-router'
+
+// Enums
 import { RouterEnum } from '@/enums/router.enum'
 
-const userInfo = reactive<{
-  username: string
-  name: string
-  email: string
-  password: string
-  confirmPassword: string
-}>({
-  username: '',
-  name: '',
-  email: '',
-  password: '',
-  confirmPassword: '',
-})
+// Schema
+import { registerSchema } from '@/validationSchema/register.schema'
+
+// Services
+import registerServices from '@/services/register.services'
+
+// Router
+const router = useRouter()
 
 const errorMessage = ref('')
 
-const handleRegister = async () => {
-  console.log(userInfo)
-}
+const { errors, handleSubmit, defineField, isSubmitting } = useForm({
+  validationSchema: registerSchema,
+})
+
+const [firstName, firstNameAttrs] = defineField('firstName')
+const [lastName, lastNameAttrs] = defineField('lastName')
+const [email, emailAttrs] = defineField('email')
+const [password, passwordAttrs] = defineField('password')
+const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword')
+
+const handleRegister = handleSubmit(async (values) => {
+  errorMessage.value = ''
+
+  const { data, message, success } = await registerServices.register(values)
+
+  if (!success && !data) {
+    errorMessage.value = message
+    return
+  }
+
+  router.push({ name: RouterEnum.HOME })
+})
 </script>
 
 <style scoped lang="scss">

@@ -1,20 +1,23 @@
 import type { AxiosError } from 'axios'
+
+import type {
+  IRegisterUserType,
+  IRegisterServiceResponseType,
+  IRegisterReturnType,
+} from '@/types/register/register.model'
+
 import api from '@/utils/axios'
 
-// Types
-import type {
-  ILoginServiceResponseType,
-  ILoginUserType,
-  ILoginReturnType,
-} from '@/types/login/login.model'
-
-class LoginServices {
-  async login(userData: ILoginUserType): Promise<ILoginReturnType> {
+class RegisterServices {
+  async register(userData: IRegisterUserType): Promise<IRegisterReturnType> {
     try {
-      const { email, password } = userData || {}
-      const response = await api.post<ILoginServiceResponseType>('/users/login', {
+      const { firstName, lastName, email, password, confirmPassword } = userData || {}
+      const response = await api.post<IRegisterServiceResponseType>('/users/register', {
+        firstName,
+        lastName,
         email,
         password,
+        confirmPassword,
       })
 
       const { data, message, success } = response.data || {}
@@ -40,4 +43,4 @@ class LoginServices {
   }
 }
 
-export default new LoginServices()
+export default new RegisterServices()
