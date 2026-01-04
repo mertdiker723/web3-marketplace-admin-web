@@ -6,11 +6,11 @@
       :headers="headers"
       :items="users"
       :loading="loading"
-      :show-view-button="true"
-      :show-edit-button="true"
-      :show-delete-button="true"
-      delete-dialog-title="Delete User"
-      delete-dialog-text="Are you sure you want to delete this user?"
+      :limit="pagination.limit"
+      :total-items="pagination.total"
+      :page="pagination.page"
+      @update:page="handlePageChange"
+      @update:items-per-page="handleItemsPerPageChange"
       @view="handleView"
       @edit="handleEdit"
       @delete-confirmed="handleDeleteConfirmed"
@@ -30,11 +30,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
+import type { IUser } from '@/types/user/user.model'
+
 import DataTable from '@/common/DataTable/index.vue'
 import userServices from '@/services/user.services'
 import { formatDate } from '@/utils/helperFunctions'
-import type { IUser } from '@/types/user/user.model'
 
 // Refs
 const dataTableRef = ref<{
@@ -43,6 +44,13 @@ const dataTableRef = ref<{
 } | null>(null)
 const users = ref<IUser[]>([])
 const loading = ref(true)
+
+const pagination = reactive({
+  page: 1,
+  totalPages: 0,
+  limit: 5,
+  total: 0,
+})
 
 // Table headers
 const headers = [
@@ -57,16 +65,35 @@ const headers = [
 ]
 
 const fetchUsers = async () => {
-  const { data, message, success } = await userServices.getUsers()
+  loading.value = true
+  const {
+    data,
+    message,
+    success,
+    pagination: paginationData,
+  } = await userServices.getUsers(pagination.page, pagination.limit)
 
   users.value = data || []
+  pagination.page = paginationData?.page || 1
+  pagination.totalPages = paginationData?.totalPages || 1
+  pagination.total = paginationData?.total || 0
 
   if (!success || !data) {
     dataTableRef.value?.showError(message || 'Failed to load users')
-    return
   }
 
   loading.value = false
+}
+
+const handlePageChange = async (page: number) => {
+  pagination.page = page
+  await fetchUsers()
+}
+
+const handleItemsPerPageChange = async (itemsPerPage: number) => {
+  pagination.limit = itemsPerPage
+  pagination.page = 1
+  await fetchUsers()
 }
 
 // Handle view user

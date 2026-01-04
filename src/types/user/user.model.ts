@@ -5,6 +5,13 @@ export interface IUserType {
   name: string
 }
 
+export interface IPagination {
+  limit: number
+  page: number
+  total: number
+  totalPages: number
+}
+
 export interface IUser {
   id: string
   firstName: string
@@ -28,10 +35,12 @@ export interface IUserResponseType {
   data: IUser[]
   message: string
   success: boolean
+  pagination: IPagination
 }
 
 export interface IUserReturnType {
   data: IUser[] | null
   message: string
   success: boolean
+  pagination?: IPagination
 }

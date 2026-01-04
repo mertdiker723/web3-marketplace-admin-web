@@ -11,11 +11,22 @@
         <h2>{{ title }}</h2>
       </v-card-title>
 
-      <v-data-table
+      <v-data-table-server
         :headers="headers"
         :items="items"
-        :items-per-page="itemsPerPage"
+        :items-per-page="limit"
+        :items-per-page-options="[
+          { value: 5, title: '5' },
+          { value: 10, title: '10' },
+          { value: 25, title: '25' },
+          { value: 50, title: '50' },
+          { value: 100, title: '100' },
+        ]"
         :search="search"
+        :items-length="totalItems"
+        :page="page"
+        @update:page="handlePageChange"
+        @update:items-per-page="handleItemsPerPageChange"
       >
         <template
           v-for="header in headersWithoutActions"
@@ -60,15 +71,14 @@
             </v-btn>
           </slot>
         </template>
-      </v-data-table>
+      </v-data-table-server>
     </div>
   </v-card>
 
-  <!-- Delete Confirmation Dialog -->
   <v-dialog v-model="deleteDialog" max-width="400">
     <v-card>
-      <v-card-title>{{ deleteDialogTitle }}</v-card-title>
-      <v-card-text>{{ deleteDialogText }}</v-card-text>
+      <v-card-title>Delete Confirmation</v-card-title>
+      <v-card-text>Are you sure you want to delete this record?</v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn @click="deleteDialog = false">{{ cancelButtonText }}</v-btn>
@@ -116,34 +126,34 @@ interface Props {
   headers: DataTableHeader[]
   items: T[]
   loading?: boolean
-  itemsPerPage?: number
+  limit?: number
   search?: string
   showViewButton?: boolean
   showEditButton?: boolean
   showDeleteButton?: boolean
-  deleteDialogTitle?: string
-  deleteDialogText?: string
   cancelButtonText?: string
   confirmButtonText?: string
   confirmDelete?: boolean
   emptyStateTitle?: string
   emptyStateText?: string
+  totalItems?: number
+  page?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
-  itemsPerPage: 10,
+  limit: 5,
   search: '',
   showViewButton: true,
   showEditButton: true,
   showDeleteButton: true,
-  deleteDialogTitle: 'Delete Confirmation',
-  deleteDialogText: 'Are you sure you want to delete this record?',
   cancelButtonText: 'Cancel',
   confirmButtonText: 'Delete',
   confirmDelete: true,
   emptyStateTitle: 'No Data Available',
   emptyStateText: 'There are no records to display at the moment.',
+  totalItems: 0,
+  page: 1,
 })
 
 const deleteDialog = ref(false)
@@ -158,6 +168,8 @@ const emit = defineEmits<{
   edit: [item: T]
   delete: [item: T]
   deleteConfirmed: [item: T]
+  'update:page': [page: number]
+  'update:itemsPerPage': [itemsPerPage: number]
 }>()
 
 const headersWithoutActions = computed(() => {
@@ -195,6 +207,14 @@ const confirmDeleteAction = () => {
     deleteDialog.value = false
     itemToDelete.value = null
   }
+}
+
+const handlePageChange = (page: number) => {
+  emit('update:page', page)
+}
+
+const handleItemsPerPageChange = (itemsPerPage: number) => {
+  emit('update:itemsPerPage', itemsPerPage)
 }
 
 defineExpose({
