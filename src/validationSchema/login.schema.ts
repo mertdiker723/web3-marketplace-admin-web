@@ -4,7 +4,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 const zodSchema = z.object({
   email: z.preprocess(
     (val) => (val === null || val === undefined ? '' : val),
-    z.email('Please enter a valid email address').trim().min(1, 'Email is required'),
+    z.string().trim().min(1, 'Email is required').email('Please enter a valid email address'),
   ),
 
   password: z.preprocess(
