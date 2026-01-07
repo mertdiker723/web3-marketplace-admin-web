@@ -73,7 +73,6 @@
               >
                 {{ isSubmitting ? 'Loading...' : 'Register' }}
               </button-field>
-              <p class="text-red text-body-1">{{ errorMessage }}</p>
               <div class="text-center">
                 <span class="text-grey text-body-1">Already have an account? </span>
                 <router-link
@@ -105,10 +104,13 @@ import { registerSchema } from '@/validationSchema/register.schema'
 // Services
 import registerServices from '@/services/register.services'
 
+// Stores
+import { useSnackbarStore } from '@/stores/snackbar'
+
+const snackbarStore = useSnackbarStore()
+
 // Router
 const router = useRouter()
-
-const errorMessage = ref('')
 
 const { errors, handleSubmit, defineField, isSubmitting } = useForm({
   validationSchema: registerSchema,
@@ -121,15 +123,14 @@ const [password, passwordAttrs] = defineField('password')
 const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword')
 
 const handleRegister = handleSubmit(async (values) => {
-  errorMessage.value = ''
-
   const { data, message, success } = await registerServices.register(values)
 
   if (!success && !data) {
-    errorMessage.value = message
+    snackbarStore.showError(message || 'Registration failed')
     return
   }
 
+  snackbarStore.showSuccess('Registration successful!')
   router.push({ name: RouterEnum.HOME })
 })
 </script>

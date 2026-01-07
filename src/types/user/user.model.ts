@@ -31,6 +31,18 @@ export interface IUser {
   userTypes: IUserType
 }
 
+export interface ISingleUserResponseType {
+  data: IUser
+  message: string
+  success: boolean
+}
+
+export interface ISingleUserReturnType {
+  data: IUser | null
+  message: string
+  success: boolean
+}
+
 export interface IUserResponseType {
   data: IUser[]
   message: string

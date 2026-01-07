@@ -9,6 +9,7 @@
       :limit="pagination.limit"
       :total-items="pagination.total"
       :page="pagination.page"
+      :button-loading="buttonLoading"
       @update:page="handlePageChange"
       @update:items-per-page="handleItemsPerPageChange"
       @view="handleView"
@@ -26,29 +27,38 @@
         <span v-else class="empty-value">-</span>
       </template>
     </DataTable>
+
+    <UserViewModal v-model="viewDialog" :user="selectedUser" />
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
-import type { IUser } from '@/types/user/user.model'
+import { useRouter } from 'vue-router'
 
+import type { IUser } from '@/types/user/user.model'
 import DataTable from '@/common/DataTable/index.vue'
+import UserViewModal from '@/components/User/modals/userViewModal.vue'
 import userServices from '@/services/user.services'
 import { formatDate } from '@/utils/helperFunctions'
+import { RouterEnum } from '@/enums/router.enum'
 
 // Refs
 const dataTableRef = ref<{
   showError: (msg: string) => void
   showSuccess: (msg: string) => void
+  handleDeleteSuccess: () => void
 } | null>(null)
 const users = ref<IUser[]>([])
 const loading = ref(true)
+const viewDialog = ref(false)
+const selectedUser = ref<IUser | null>(null)
+const buttonLoading = ref(false)
 
 const pagination = reactive({
   page: 1,
   totalPages: 0,
-  limit: 5,
+  limit: 10,
   total: 0,
 })
 
@@ -63,6 +73,8 @@ const headers = [
   { title: 'Created At', key: 'createdAt', sortable: false },
   { title: '', key: 'actions', sortable: false, align: 'end' as const },
 ]
+
+const router = useRouter()
 
 const fetchUsers = async () => {
   loading.value = true
@@ -96,26 +108,38 @@ const handleItemsPerPageChange = async (itemsPerPage: number) => {
   await fetchUsers()
 }
 
-// Handle view user
-const handleView = (user: IUser) => {
-  console.log('View user:', user)
-  dataTableRef.value?.showSuccess(`Viewing user: ${user.firstName} ${user.lastName}`)
+const handleView = async (user: IUser) => {
+  buttonLoading.value = true
+  const { success, data } = await userServices.getSelectedUser(user.id)
+
+  if (success && data) {
+    selectedUser.value = data
+    viewDialog.value = true
+  } else {
+    dataTableRef.value?.showError('Failed to fetch user details')
+  }
+  buttonLoading.value = false
 }
 
-// Handle edit user
 const handleEdit = (user: IUser) => {
-  console.log('Edit user:', user)
-  dataTableRef.value?.showSuccess(`Editing user: ${user.firstName} ${user.lastName}`)
+  router.push({ name: RouterEnum.USER_FORM, params: { id: user.id } })
 }
 
-// Handle delete confirmed
 const handleDeleteConfirmed = async (user: IUser) => {
-  console.log('Delete user:', user)
+  buttonLoading.value = true
+  const response = await userServices.deleteUser(user.id)
+  if (response.success) {
+    dataTableRef.value?.showSuccess('User deleted successfully')
+    dataTableRef.value?.handleDeleteSuccess()
+    await fetchUsers()
+  } else {
+    dataTableRef.value?.showError(response.message || 'Failed to delete user')
+  }
+  buttonLoading.value = false
 }
 
-// Initialize
-onMounted(() => {
-  fetchUsers()
+onMounted(async () => {
+  await fetchUsers()
 })
 </script>
 

@@ -39,7 +39,6 @@
                 >
               </div>
 
-              <p class="text-red text-body-1 mb-3">{{ errorMessage }}</p>
               <button-field
                 type="submit"
                 block
@@ -69,7 +68,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 
@@ -82,11 +80,13 @@ import { RouterEnum } from '@/enums/router.enum'
 // Services
 import loginServices from '@/services/login.services'
 
+// Stores
+import { useSnackbarStore } from '@/stores/snackbar'
+
+const snackbarStore = useSnackbarStore()
+
 // Router
 const router = useRouter()
-
-// Refs
-const errorMessage = ref('')
 
 const { errors, handleSubmit, defineField, isSubmitting } = useForm({
   validationSchema: loginSchema,
@@ -96,12 +96,10 @@ const [email, emailAttrs] = defineField('email')
 const [password, passwordAttrs] = defineField('password')
 
 const handleLogin = handleSubmit(async (values) => {
-  errorMessage.value = ''
-
   const { data, message, success } = await loginServices.login(values)
 
   if (!success && !data) {
-    errorMessage.value = message
+    snackbarStore.showError(message || 'Login failed')
     return
   }
 

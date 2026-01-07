@@ -27,28 +27,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { RouterEnum } from '@/enums/router.enum'
+import { UserTypeEnum } from '@/enums/user.enum'
+import { getUserInfoFromToken } from '@/utils/userAuthToken'
 
 // State
 const drawer = ref(false)
 const router = useRouter()
 
-const menuItems = [
+// Get user info from token
+const token = localStorage.getItem('token')
+const userInfo = token ? getUserInfoFromToken(token) : null
+const userType = userInfo?.userType
+
+const allMenuItems = [
   {
     title: 'Ana Sayfa',
     value: 'home',
     icon: 'mdi-home',
     to: '/',
+    roles: [UserTypeEnum.SUPER_ADMIN, UserTypeEnum.ADMIN, UserTypeEnum.GUEST_ADMIN],
   },
   {
     title: 'Kullanıcılar',
     value: 'users',
     icon: 'mdi-account',
     to: '/users',
+    roles: [UserTypeEnum.SUPER_ADMIN],
   },
 ]
+
+const menuItems = computed(() => {
+  if (userType) {
+    return allMenuItems.filter((item) => item.roles.includes(userType))
+  }
+  return []
+})
 
 const handleLogout = () => {
   localStorage.removeItem('token')

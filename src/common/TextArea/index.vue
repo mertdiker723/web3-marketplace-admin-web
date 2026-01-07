@@ -1,10 +1,9 @@
 <template>
   <div :class="containerClass">
     <label v-if="label" :for="id">{{ label }}</label>
-    <v-text-field
+    <v-textarea
       :id="id"
       :label="placeholder"
-      :type="type"
       :variant="variant"
       :placeholder="placeholder"
       :prepend-inner-icon="prependInnerIcon"
@@ -27,7 +26,7 @@ defineProps<{
   modelValue?: string | number
   label?: string
   id?: string
-  type?: 'text' | 'password' | 'email' | 'number' | 'date' | 'file'
+  type: 'textarea'
   variant?:
     | 'filled'
     | 'outlined'
@@ -45,9 +44,7 @@ defineProps<{
   errorMessages?: string | string[]
 }>()
 
-const emit = defineEmits<{
-  (e: 'update:modelValue', value: string | number): void
-}>()
+const emit = defineEmits(['update:modelValue'])
 
 const onUpdateModelValue = (value: string | number) => {
   emit('update:modelValue', value)

@@ -3,6 +3,7 @@ enum RouterEnum {
   LOGIN = 'login',
   REGISTER = 'register',
   USERS = 'users',
+  USER_FORM = 'userForm',
 }
 
 export { RouterEnum }

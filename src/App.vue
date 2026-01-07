@@ -14,6 +14,13 @@
     <template v-else>
       <router-view />
     </template>
+
+    <Snackbar
+      v-model="snackbarStore.state.show"
+      :message="snackbarStore.state.message"
+      :color="snackbarStore.state.color"
+      :icon="snackbarStore.state.icon"
+    />
   </v-app>
 </template>
 
@@ -21,7 +28,11 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Sidebar from './components/Sidebar/index.vue'
+import Snackbar from './common/Snackbar/index.vue'
+import { useSnackbarStore } from './stores/snackbar'
 import { RouterEnum } from './enums/router.enum'
+
+const snackbarStore = useSnackbarStore()
 
 const route = useRoute()
 

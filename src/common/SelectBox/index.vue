@@ -1,18 +1,23 @@
 <template>
   <div :class="containerClass">
     <label v-if="label" :for="id">{{ label }}</label>
-    <v-text-field
+    <v-select
       :id="id"
       :label="placeholder"
-      :type="type"
+      :items="items"
+      :item-title="itemTitle"
+      :item-value="itemValue"
       :variant="variant"
-      :placeholder="placeholder"
-      :prepend-inner-icon="prependInnerIcon"
       :density="density"
-      :class="inputClass"
-      :autocomplete="autocomplete"
+      :placeholder="placeholder"
+      :clearable="clearable"
+      :chips="chips"
+      :multiple="multiple"
+      :class="selectClass"
       :error-messages="errorMessages"
       :model-value="modelValue"
+      :disabled="disabled"
+      :loading="loading"
       v-bind="$attrs"
       @update:model-value="onUpdateModelValue"
     />
@@ -23,11 +28,18 @@
 defineOptions({
   inheritAttrs: false,
 })
+
+interface SelectItem {
+  [key: string]: string | number | boolean | null | undefined
+}
+
 defineProps<{
-  modelValue?: string | number
+  modelValue?: string | number | string[] | number[] | null
   label?: string
   id?: string
-  type?: 'text' | 'password' | 'email' | 'number' | 'date' | 'file'
+  items: (string | number | SelectItem)[]
+  itemTitle?: string
+  itemValue?: string
   variant?:
     | 'filled'
     | 'outlined'
@@ -36,20 +48,23 @@ defineProps<{
     | 'solo-filled'
     | 'solo-inverted'
     | 'underlined'
-  prependInnerIcon?: string
   density?: 'default' | 'comfortable' | 'compact'
-  inputClass?: string
+  selectClass?: string
   containerClass?: string
   placeholder?: string
-  autocomplete?: string
+  clearable?: boolean
+  chips?: boolean
+  multiple?: boolean
   errorMessages?: string | string[]
+  disabled?: boolean
+  loading?: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string | number): void
+  (e: 'update:modelValue', value: string | number | string[] | number[] | null): void
 }>()
 
-const onUpdateModelValue = (value: string | number) => {
+const onUpdateModelValue = (value: string | number | string[] | number[] | null) => {
   emit('update:modelValue', value)
 }
 </script>

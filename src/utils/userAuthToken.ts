@@ -37,7 +37,7 @@ export const isTokenValid = (token: string): boolean => {
 
 export const getUserInfoFromToken = (
   token: string,
-): { id: string; email: string; userType: string } | null => {
+): { id: string; email: string; userType: number } | null => {
   try {
     const atobTokenPayload = atob(token.split('.')[1] || '')
     if (!atobTokenPayload) {
@@ -52,7 +52,7 @@ export const getUserInfoFromToken = (
     return {
       id,
       email,
-      userType,
+      userType: Number(userType),
     }
   } catch {
     return null

@@ -15,3 +15,21 @@ export interface INeighborhood {
   districtId: number
   provinceId: number
 }
+
+export interface IProvinceResponseType {
+  data: IProvince[] | null
+  message: string
+  success: boolean
+}
+
+export interface IDistrictResponseType {
+  data: IDistrict[] | null
+  message: string
+  success: boolean
+}
+
+export interface INeighborhoodResponseType {
+  data: INeighborhood[] | null
+  message: string
+  success: boolean
+}
