@@ -22,6 +22,10 @@
       <v-col cols="12" sm="6" class="mt-2 mt-sm-0">
         <v-skeleton-loader type="text" />
       </v-col>
+      <!-- User Type -->
+      <v-col cols="12" sm="6" class="mt-2 mt-sm-0">
+        <v-skeleton-loader type="text" />
+      </v-col>
       <!-- Password -->
       <v-col cols="12" sm="6" class="mt-2 mt-sm-0">
         <v-skeleton-loader type="text" />

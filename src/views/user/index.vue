@@ -26,6 +26,37 @@
         <span v-if="item.createdAt">{{ formatDate(item.createdAt) }}</span>
         <span v-else class="empty-value">-</span>
       </template>
+
+      <template v-slot:[`item.actions`]="{ item }">
+        <button-field
+          color="info"
+          size="small"
+          btn-class="mr-2"
+          :loading="buttonLoading"
+          @click="handleView(item)"
+        >
+          View
+        </button-field>
+        <button-field
+          color="primary"
+          size="small"
+          btn-class="mr-2"
+          :loading="buttonLoading"
+          :disabled="item.userTypes.id === UserTypeEnum.SUPER_ADMIN"
+          @click="handleEdit(item)"
+        >
+          Edit
+        </button-field>
+        <button-field
+          color="error"
+          size="small"
+          :loading="buttonLoading"
+          :disabled="item.userTypes.id === UserTypeEnum.SUPER_ADMIN"
+          @click="handleDelete(item)"
+        >
+          Delete
+        </button-field>
+      </template>
     </DataTable>
 
     <UserViewModal v-model="viewDialog" :user="selectedUser" />
@@ -42,12 +73,14 @@ import UserViewModal from '@/components/User/modals/userViewModal.vue'
 import userServices from '@/services/user.services'
 import { formatDate } from '@/utils/helperFunctions'
 import { RouterEnum } from '@/enums/router.enum'
+import { UserTypeEnum } from '@/enums/user.enum'
 
 // Refs
 const dataTableRef = ref<{
   showError: (msg: string) => void
   showSuccess: (msg: string) => void
   handleDeleteSuccess: () => void
+  handleDeleteClick?: (item: IUser) => void
 } | null>(null)
 const users = ref<IUser[]>([])
 const loading = ref(true)
@@ -122,7 +155,20 @@ const handleView = async (user: IUser) => {
 }
 
 const handleEdit = (user: IUser) => {
+  if (user.userTypes.id === UserTypeEnum.SUPER_ADMIN) {
+    return
+  }
   router.push({ name: RouterEnum.USER_FORM, params: { id: user.id } })
+}
+
+const handleDelete = (user: IUser) => {
+  if (user.userTypes.id === UserTypeEnum.SUPER_ADMIN) {
+    return
+  }
+
+  if (dataTableRef.value?.handleDeleteClick) {
+    dataTableRef.value.handleDeleteClick(user)
+  }
 }
 
 const handleDeleteConfirmed = async (user: IUser) => {
@@ -147,5 +193,12 @@ onMounted(async () => {
 .empty-value {
   color: #999;
   font-style: italic;
+}
+
+/* Disabled button styles */
+:deep(.v-btn--disabled) {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: auto !important;
 }
 </style>

@@ -8,6 +8,16 @@
         </v-col>
       </v-row>
       <v-row>
+        <v-col cols="12">
+          <input-field
+            type="text"
+            variant="outlined"
+            v-model="userTypeName"
+            disabled
+            density="comfortable"
+            placeholder="User Type"
+          />
+        </v-col>
         <v-col cols="12" sm="6">
           <input-field
             type="text"
@@ -40,7 +50,7 @@
             placeholder="Enter email"
           />
         </v-col>
-        <v-col>
+        <v-col cols="12" sm="6" class="mt-2 mt-sm-0">
           <input-field
             type="text"
             variant="outlined"
@@ -51,6 +61,7 @@
             :error-messages="errors.phone"
           />
         </v-col>
+
         <v-col cols="12" sm="6" class="mt-2 mt-sm-0">
           <input-field
             type="password"
@@ -118,6 +129,7 @@
             type="textarea"
             variant="outlined"
             v-model="openAddress"
+            :maxlength="200"
             density="comfortable"
             placeholder="Enter open address"
           />
@@ -170,6 +182,7 @@ const snackbarStore = useSnackbarStore()
 
 const userId = ref('')
 const email = ref('')
+const userTypeName = ref('')
 const provinceId = ref<number | null>(null)
 const districtId = ref<number | null>(null)
 const neighborhoodId = ref<number | null>(null)
@@ -183,6 +196,7 @@ const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword')
 
 const getDetailProfile = async () => {
   initialLoading.value = true
+
   const { data, success } = await userServices.getUserMe()
 
   if (success && data) {
@@ -200,9 +214,10 @@ const getDetailProfile = async () => {
     lastName.value = data.lastName
     email.value = data.email
     phone.value = data.phone
-    provinceId.value = data.provinces.id
-    districtId.value = data.districts.id
-    neighborhoodId.value = data.neighborhoods.id
+    userTypeName.value = data.userTypes?.name || ''
+    provinceId.value = data.provinces?.id || null
+    districtId.value = data.districts?.id || null
+    neighborhoodId.value = data.neighborhoods?.id || null
     openAddress.value = data.openAddress || ''
   }
   initialLoading.value = false

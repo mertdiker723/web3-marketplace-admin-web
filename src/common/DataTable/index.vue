@@ -214,6 +214,7 @@ defineExpose({
     snackbarStore.showSuccess(message)
   },
   handleDeleteSuccess,
+  handleDeleteClick,
 })
 </script>
 
