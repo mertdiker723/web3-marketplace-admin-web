@@ -1,5 +1,6 @@
 import type { AxiosError } from 'axios'
 import api from '@/utils/axios'
+import { setToken } from '@/utils/token'
 
 // Types
 import type {
@@ -20,7 +21,7 @@ class LoginServices {
       const { data, message, success } = response.data || {}
       const { token, user } = data || {}
 
-      localStorage.setItem('token', token)
+      setToken(token)
 
       return {
         data: user,

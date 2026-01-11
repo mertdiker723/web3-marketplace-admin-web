@@ -1,16 +1,13 @@
 <template>
   <v-app>
-    <template v-if="showSidebar">
+    <template v-if="withSidebar">
       <v-layout>
         <Sidebar />
         <v-main>
-          <v-container fluid>
-            <router-view />
-          </v-container>
+          <router-view />
         </v-main>
       </v-layout>
     </template>
-
     <template v-else>
       <router-view />
     </template>
@@ -25,20 +22,45 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import Sidebar from './components/Sidebar/index.vue'
-import Snackbar from './common/Snackbar/index.vue'
-import { useSnackbarStore } from './stores/snackbar'
+
+// Enums
 import { RouterEnum } from './enums/router.enum'
 
+// Components
+import Sidebar from './components/Sidebar/index.vue'
+import Snackbar from './common/Snackbar/index.vue'
+
+// Stores
+import { useSnackbarStore } from './stores/snackbar'
+import { useUserStore } from './stores/user'
+
+// Services
+import userServices from './services/user.services'
+
+// Utils
+import { isTokenValid } from './utils/userAuthToken'
+import { getToken } from './utils/token'
+
 const snackbarStore = useSnackbarStore()
+const userStore = useUserStore()
 
 const route = useRoute()
 
-// Sidebar should not be shown on login and register pages
-const showSidebar = computed(() => {
-  const routesWithoutSidebar = [RouterEnum.LOGIN, RouterEnum.REGISTER]
+const withSidebar = computed(() => {
+  const routesWithoutSidebar = [RouterEnum.LOGIN, RouterEnum.REGISTER, RouterEnum.NOT_FOUND]
   return !routesWithoutSidebar.includes(route.name as RouterEnum)
+})
+
+onMounted(async () => {
+  const validToken = isTokenValid(getToken() as string)
+  if (validToken && !userStore.state.data) {
+    const response = await userServices.getUserMe()
+
+    if (response.success && response.data) {
+      userStore.setUser(response.data)
+    }
+  }
 })
 </script>

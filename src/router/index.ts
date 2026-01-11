@@ -4,12 +4,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 // Utils
 import { isTokenValid, getUserInfoFromToken } from '@/utils/userAuthToken'
+import { getToken, removeToken } from '@/utils/token'
 
 const Home = () => import('../views/home/index.vue')
 const Login = () => import('../views/login/index.vue')
 const Register = () => import('../views/register/index.vue')
 const User = () => import('../views/user/index.vue')
 const UserForm = () => import('../views/userForm/index.vue')
+const Profile = () => import('../views/profile/index.vue')
+const NotFound = () => import('../views/notFound/index.vue')
 
 const routes = [
   {
@@ -45,6 +48,21 @@ const routes = [
     component: UserForm,
     meta: { requiresAuth: true, allowedRoles: [UserTypeEnum.SUPER_ADMIN] },
   },
+  {
+    path: '/profile',
+    name: RouterEnum.PROFILE,
+    component: Profile,
+    meta: {
+      requiresAuth: true,
+      allowedRoles: [UserTypeEnum.ADMIN, UserTypeEnum.GUEST_ADMIN, UserTypeEnum.SUPER_ADMIN],
+    },
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: RouterEnum.NOT_FOUND,
+    component: NotFound,
+    meta: { requiresAuth: false },
+  },
 ]
 
 const router = createRouter({
@@ -55,11 +73,11 @@ const router = createRouter({
 const withoutAuthRoutes: RouterEnum[] = [RouterEnum.LOGIN, RouterEnum.REGISTER]
 
 router.beforeEach((to, _from, next) => {
-  const token = localStorage.getItem('token') as string
-  const isTokenValidResult = isTokenValid(token)
+  const token = getToken()
+  const isTokenValidResult = isTokenValid(token as string)
 
   if (token && !isTokenValidResult) {
-    localStorage.removeItem('token')
+    removeToken()
     return next({ name: RouterEnum.LOGIN })
   }
 
@@ -74,7 +92,7 @@ router.beforeEach((to, _from, next) => {
   if (token && to.meta.allowedRoles) {
     const userInfo = getUserInfoFromToken(token)
     if (!userInfo) {
-      localStorage.removeItem('token')
+      removeToken()
       return next({ name: RouterEnum.LOGIN })
     }
 

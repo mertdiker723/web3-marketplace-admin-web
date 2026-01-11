@@ -18,10 +18,10 @@ export interface IUser {
   lastName: string
   email: string
   phone: string
-  openAddress?: string
-  provinceId: number
-  districtId: number
-  neighborhoodId: number
+  openAddress?: string | null
+  provinceId?: number | null
+  districtId?: number | null
+  neighborhoodId?: number | null
   provinces: IProvince
   districts: IDistrict
   neighborhoods: INeighborhood

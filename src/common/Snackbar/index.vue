@@ -47,7 +47,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   color: 'info',
-  timeout: 3000,
+  timeout: 1500,
   location: 'top right',
   closeable: false,
   closeText: 'Close',

@@ -7,6 +7,7 @@ import type {
 } from '@/types/register/register.model'
 
 import api from '@/utils/axios'
+import { setToken } from '@/utils/token'
 
 class RegisterServices {
   async register(userData: IRegisterUserType): Promise<IRegisterReturnType> {
@@ -23,7 +24,7 @@ class RegisterServices {
       const { data, message, success } = response.data || {}
       const { token, user } = data || {}
 
-      localStorage.setItem('token', token)
+      setToken(token)
 
       return {
         data: user,

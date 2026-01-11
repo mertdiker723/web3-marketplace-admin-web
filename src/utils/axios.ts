@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getToken, removeToken } from './token'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -6,7 +7,8 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
+    const token = getToken()
+
     if (token) {
       config.headers.Authentication = `Bearer ${token}`
     }
@@ -23,7 +25,7 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-      localStorage.removeItem('token')
+      removeToken()
       window.location.href = '/login'
     }
     return Promise.reject(error)

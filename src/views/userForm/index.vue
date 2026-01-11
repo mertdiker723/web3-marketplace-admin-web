@@ -130,7 +130,7 @@
             </v-col>
           </v-row>
 
-          <Button type="submit" color="primary" :loading="isSubmitting"> Save </Button>
+          <button-field type="submit" color="primary" :loading="isSubmitting"> Save </button-field>
         </v-form>
       </v-card-text>
     </v-card>
@@ -148,7 +148,7 @@ import type { IDistrict, INeighborhood, IProvince } from '@/types/location/locat
 import type { IUserType } from '@/types/user/user.model'
 
 import { RouterEnum } from '@/enums/router.enum'
-import Button from '@/common/Button/index.vue'
+
 import { useSnackbarStore } from '@/stores/snackbar'
 import userServices from '@/services/user.services'
 import locationServices from '@/services/location.services'

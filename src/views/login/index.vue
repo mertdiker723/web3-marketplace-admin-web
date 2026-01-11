@@ -82,8 +82,10 @@ import loginServices from '@/services/login.services'
 
 // Stores
 import { useSnackbarStore } from '@/stores/snackbar'
+import { useUserStore } from '@/stores/user'
 
 const snackbarStore = useSnackbarStore()
+const userStore = useUserStore()
 
 // Router
 const router = useRouter()
@@ -97,6 +99,10 @@ const [password, passwordAttrs] = defineField('password')
 
 const handleLogin = handleSubmit(async (values) => {
   const { data, message, success } = await loginServices.login(values)
+
+  if (success && data) {
+    userStore.setUser(data)
+  }
 
   if (!success && !data) {
     snackbarStore.showError(message || 'Login failed')

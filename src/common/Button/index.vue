@@ -1,5 +1,6 @@
 <template>
   <v-btn
+    v-bind="$attrs"
     :type="type"
     :block="block"
     :color="color"
@@ -9,6 +10,7 @@
     :loading="loading"
     :prepend-icon="prependIcon"
     :append-icon="appendIcon"
+    :icon="icon"
     :class="btnClass"
     @click="handleClick"
   >
@@ -17,6 +19,10 @@
 </template>
 
 <script setup lang="ts">
+defineOptions({
+  inheritAttrs: false,
+})
+
 defineProps<{
   type?: 'button' | 'submit' | 'reset'
   block?: boolean
@@ -28,11 +34,12 @@ defineProps<{
   prependIcon?: string
   appendIcon?: string
   btnClass?: string
+  icon?: boolean | string
 }>()
 
 const emit = defineEmits(['click'])
 
-const handleClick = () => {
-  emit('click')
+const handleClick = (event: MouseEvent) => {
+  emit('click', event)
 }
 </script>
