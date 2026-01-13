@@ -78,7 +78,7 @@
     </div>
   </v-card>
 
-  <Modal
+  <modal-field
     v-model="deleteDialog"
     title="Delete Confirmation"
     show-default-actions
@@ -89,7 +89,7 @@
     @confirm="confirmDeleteAction"
   >
     Are you sure you want to delete this record?
-  </Modal>
+  </modal-field>
 </template>
 
 <script
@@ -100,7 +100,6 @@
 import { computed, ref } from 'vue'
 import EmptyState from '@/common/EmptyState/index.vue'
 import TableSkeleton from '@/common/Skeletons/table.skeleton.vue'
-import Modal from '@/common/Modal/index.vue'
 import Button from '@/common/Button/index.vue'
 import { useSnackbarStore } from '@/stores/snackbar'
 

@@ -1,15 +1,9 @@
 import type { IDistrict, IProvince, INeighborhood } from '../location/location.model'
+import type { IPagination } from '../index'
 
 export interface IUserType {
   id: number
   name: string
-}
-
-export interface IPagination {
-  limit: number
-  page: number
-  total: number
-  totalPages: number
 }
 
 export interface IUser {

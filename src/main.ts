@@ -17,6 +17,7 @@ import Input from './common/Input/index.vue'
 import Button from './common/Button/index.vue'
 import TextArea from './common/TextArea/index.vue'
 import SelectBox from './common/SelectBox/index.vue'
+import Modal from './common/Modal/index.vue'
 
 const vuetify = createVuetify({
   components,
@@ -29,6 +30,7 @@ app.component('input-field', Input)
 app.component('button-field', Button)
 app.component('text-area', TextArea)
 app.component('select-box-field', SelectBox)
+app.component('modal-field', Modal)
 
 app.use(vuetify)
 app.use(createPinia())

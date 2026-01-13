@@ -79,17 +79,24 @@ const user = computed(() => userStore.state.data)
 
 const allMenuItems = [
   {
-    title: 'Ana Sayfa',
-    value: 'home',
+    title: 'Home',
+    value: RouterEnum.HOME,
     icon: 'mdi-home',
-    to: '/',
+    to: { name: RouterEnum.HOME },
     roles: [UserTypeEnum.SUPER_ADMIN, UserTypeEnum.ADMIN, UserTypeEnum.GUEST_ADMIN],
   },
   {
-    title: 'Kullanıcılar',
-    value: 'users',
+    title: 'Users',
+    value: RouterEnum.USERS,
     icon: 'mdi-account',
-    to: '/users',
+    to: { name: RouterEnum.USERS },
+    roles: [UserTypeEnum.SUPER_ADMIN],
+  },
+  {
+    title: 'Brands',
+    value: RouterEnum.BRAND,
+    icon: 'mdi-tag-multiple',
+    to: { name: RouterEnum.BRAND },
     roles: [UserTypeEnum.SUPER_ADMIN],
   },
 ]

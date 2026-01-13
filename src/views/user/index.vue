@@ -189,13 +189,12 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .empty-value {
   color: #999;
   font-style: italic;
 }
 
-/* Disabled button styles */
 :deep(.v-btn--disabled) {
   opacity: 0.4 !important;
   cursor: not-allowed !important;

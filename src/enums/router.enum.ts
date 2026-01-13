@@ -6,6 +6,7 @@ enum RouterEnum {
   USER_FORM = 'userForm',
   PROFILE = 'profile',
   NOT_FOUND = 'notFound',
+  BRAND = 'brand',
 }
 
 export { RouterEnum }

@@ -12,6 +12,7 @@ const Register = () => import('../views/register/index.vue')
 const User = () => import('../views/user/index.vue')
 const UserForm = () => import('../views/userForm/index.vue')
 const Profile = () => import('../views/profile/index.vue')
+const Brand = () => import('../views/brand/index.vue')
 const NotFound = () => import('../views/notFound/index.vue')
 
 const routes = [
@@ -21,7 +22,6 @@ const routes = [
     component: Home,
     meta: {
       requiresAuth: true,
-      allowedRoles: [UserTypeEnum.ADMIN, UserTypeEnum.GUEST_ADMIN, UserTypeEnum.SUPER_ADMIN],
     },
   },
   {
@@ -54,14 +54,25 @@ const routes = [
     component: Profile,
     meta: {
       requiresAuth: true,
-      allowedRoles: [UserTypeEnum.ADMIN, UserTypeEnum.GUEST_ADMIN, UserTypeEnum.SUPER_ADMIN],
+    },
+  },
+  {
+    path: '/brand',
+    name: RouterEnum.BRAND,
+    component: Brand,
+    meta: {
+      requiresAuth: true,
+      allowedRoles: [UserTypeEnum.SUPER_ADMIN],
     },
   },
   {
     path: '/:pathMatch(.*)*',
     name: RouterEnum.NOT_FOUND,
     component: NotFound,
-    meta: { requiresAuth: false },
+    meta: {
+      requiresAuth: false,
+      allowedRoles: [UserTypeEnum.SUPER_ADMIN],
+    },
   },
 ]
 

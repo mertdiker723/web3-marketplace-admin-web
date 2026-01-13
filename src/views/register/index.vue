@@ -105,9 +105,10 @@ import registerServices from '@/services/register.services'
 
 // Stores
 import { useSnackbarStore } from '@/stores/snackbar'
+import { useUserStore } from '@/stores/user'
 
 const snackbarStore = useSnackbarStore()
-
+const userStore = useUserStore()
 // Router
 const router = useRouter()
 
@@ -123,6 +124,10 @@ const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword')
 
 const handleRegister = handleSubmit(async (values) => {
   const { data, message, success } = await registerServices.register(values)
+
+  if (success && data) {
+    userStore.setUser(data)
+  }
 
   if (!success && !data) {
     snackbarStore.showError(message || 'Registration failed')
