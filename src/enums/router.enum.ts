@@ -7,6 +7,7 @@ enum RouterEnum {
   PROFILE = 'profile',
   NOT_FOUND = 'notFound',
   BRAND = 'brand',
+  CATEGORY = 'category',
 }
 
 export { RouterEnum }

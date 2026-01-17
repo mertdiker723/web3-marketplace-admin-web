@@ -1,17 +1,15 @@
 <template>
-  <v-container fluid>
-    <DataTable
+  <v-container class="pa-0 mt-16 mb-4">
+    <data-table
       ref="dataTableRef"
       title="Users"
       :headers="headers"
       :items="users"
       :loading="loading"
-      :limit="pagination.limit"
       :total-items="pagination.total"
-      :page="pagination.page"
       :button-loading="buttonLoading"
-      @update:page="handlePageChange"
-      @update:items-per-page="handleItemsPerPageChange"
+      v-model:limit="pagination.limit"
+      v-model:page="pagination.page"
       @view="handleView"
       @edit="handleEdit"
       @delete-confirmed="handleDeleteConfirmed"
@@ -57,29 +55,28 @@
           Delete
         </button-field>
       </template>
-    </DataTable>
+    </data-table>
 
     <UserViewModal v-model="viewDialog" :user="selectedUser" />
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import type { IUser } from '@/types/user/user.model'
-import DataTable from '@/common/DataTable/index.vue'
 import UserViewModal from '@/components/User/modals/userViewModal.vue'
 import userServices from '@/services/user.services'
 import { formatDate } from '@/utils/helperFunctions'
 import { RouterEnum } from '@/enums/router.enum'
 import { UserTypeEnum } from '@/enums/user.enum'
+import { useSnackbarStore } from '@/stores/snackbar'
+
+const snackbarStore = useSnackbarStore()
 
 // Refs
 const dataTableRef = ref<{
-  showError: (msg: string) => void
-  showSuccess: (msg: string) => void
-  handleDeleteSuccess: () => void
   handleDeleteClick?: (item: IUser) => void
 } | null>(null)
 const users = ref<IUser[]>([])
@@ -119,37 +116,28 @@ const fetchUsers = async () => {
   } = await userServices.getUsers(pagination.page, pagination.limit)
 
   users.value = data || []
-  pagination.page = paginationData?.page || 1
+  if (paginationData?.page && paginationData.page !== pagination.page) {
+    pagination.page = paginationData.page
+  }
   pagination.totalPages = paginationData?.totalPages || 1
   pagination.total = paginationData?.total || 0
 
   if (!success || !data) {
-    dataTableRef.value?.showError(message || 'Failed to load users')
+    snackbarStore.showError(message)
   }
 
   loading.value = false
 }
 
-const handlePageChange = async (page: number) => {
-  pagination.page = page
-  await fetchUsers()
-}
-
-const handleItemsPerPageChange = async (itemsPerPage: number) => {
-  pagination.limit = itemsPerPage
-  pagination.page = 1
-  await fetchUsers()
-}
-
 const handleView = async (user: IUser) => {
   buttonLoading.value = true
-  const { success, data } = await userServices.getSelectedUser(user.id)
+  const { success, data, message } = await userServices.getSelectedUser(user.id)
 
   if (success && data) {
     selectedUser.value = data
     viewDialog.value = true
   } else {
-    dataTableRef.value?.showError('Failed to fetch user details')
+    snackbarStore.showError(message)
   }
   buttonLoading.value = false
 }
@@ -173,20 +161,28 @@ const handleDelete = (user: IUser) => {
 
 const handleDeleteConfirmed = async (user: IUser) => {
   buttonLoading.value = true
-  const response = await userServices.deleteUser(user.id)
-  if (response.success) {
-    dataTableRef.value?.showSuccess('User deleted successfully')
-    dataTableRef.value?.handleDeleteSuccess()
-    await fetchUsers()
+  const { success, message } = await userServices.deleteUser(user.id)
+  if (success) {
+    snackbarStore.showSuccess(message)
+
+    if (users.value.length === 1 && pagination.page > 1) {
+      pagination.page = pagination.page - 1
+    } else {
+      await fetchUsers()
+    }
   } else {
-    dataTableRef.value?.showError(response.message || 'Failed to delete user')
+    snackbarStore.showError(message)
   }
   buttonLoading.value = false
 }
 
-onMounted(async () => {
-  await fetchUsers()
-})
+watch(
+  () => [pagination.page, pagination.limit],
+  async () => {
+    await fetchUsers()
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped lang="scss">

@@ -6,19 +6,16 @@
       </button-field>
     </div>
 
-    <DataTable
-      ref="dataTableRef"
+    <data-table
       title="Brands"
       :headers="headers"
       :items="brands"
       :loading="loading"
       :showViewButton="false"
       :button-loading="buttonLoading"
-      :limit="pagination.limit"
       :total-items="pagination.total"
-      :page="pagination.page"
-      @update:page="handlePageChange"
-      @update:items-per-page="handleItemsPerPageChange"
+      v-model:limit="pagination.limit"
+      v-model:page="pagination.page"
       @edit="handleBrandFormModal"
       @delete-confirmed="handleDeleteConfirmed"
     />
@@ -32,9 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 
-import DataTable from '@/common/DataTable/index.vue'
 import BrandFormModal from '@/components/Brand/modals/BrandFormModal.vue'
 import brandServices from '@/services/brand.services'
 import { useSnackbarStore } from '@/stores/snackbar'
@@ -44,8 +40,8 @@ import { formatDate } from '@/utils/helperFunctions'
 const snackbarStore = useSnackbarStore()
 
 const headers = [
-  { title: 'Name', key: 'name' },
-  { title: 'Created At', key: 'createdAt' },
+  { title: 'Name', key: 'name', sortable: false },
+  { title: 'Created At', key: 'createdAt', sortable: false },
   { title: 'Updated At', key: 'updatedAt', sortable: false },
   { title: '', key: 'actions', sortable: false, align: 'end' as const },
 ]
@@ -56,10 +52,6 @@ const pagination = reactive({
   limit: 10,
   total: 0,
 })
-// Refs
-const dataTableRef = ref<{
-  handleDeleteSuccess: () => void
-} | null>(null)
 
 const loading = ref(false)
 const buttonLoading = ref(false)
@@ -83,7 +75,9 @@ const fetchBrands = async () => {
       updatedAt: formatDate(brand.updatedAt),
     })) || []
 
-  pagination.page = paginationData?.page || 1
+  if (paginationData?.page && paginationData.page !== pagination.page) {
+    pagination.page = paginationData.page
+  }
   pagination.totalPages = paginationData?.totalPages || 1
   pagination.total = paginationData?.total || 0
 
@@ -106,17 +100,6 @@ const fetchBrandById = async (id: string) => {
   buttonLoading.value = false
 }
 
-const handlePageChange = async (page: number) => {
-  pagination.page = page
-  await fetchBrands()
-}
-
-const handleItemsPerPageChange = async (itemsPerPage: number) => {
-  pagination.limit = itemsPerPage
-  pagination.page = 1
-  await fetchBrands()
-}
-
 const handleBrandFormModal = async (brand?: IBrand | null) => {
   if (brand?.id) {
     await fetchBrandById(brand.id as string)
@@ -132,15 +115,23 @@ const handleDeleteConfirmed = async (brand: IBrand) => {
   const { success, message, data } = await brandServices.deleteBrand(brand.id)
   if (success && data) {
     snackbarStore.showSuccess(message)
-    dataTableRef.value?.handleDeleteSuccess()
-    await fetchBrands()
+
+    if (brands.value.length === 1 && pagination.page > 1) {
+      pagination.page = pagination.page - 1
+    } else {
+      await fetchBrands()
+    }
   } else {
     snackbarStore.showError(message)
   }
   buttonLoading.value = false
 }
 
-onMounted(async () => {
-  await fetchBrands()
-})
+watch(
+  () => [pagination.page, pagination.limit],
+  async () => {
+    await fetchBrands()
+  },
+  { immediate: true },
+)
 </script>

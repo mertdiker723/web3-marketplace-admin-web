@@ -101,9 +101,6 @@ import { computed, ref } from 'vue'
 import EmptyState from '@/common/EmptyState/index.vue'
 import TableSkeleton from '@/common/Skeletons/table.skeleton.vue'
 import Button from '@/common/Button/index.vue'
-import { useSnackbarStore } from '@/stores/snackbar'
-
-const snackbarStore = useSnackbarStore()
 
 const ACTIONS_KEY = 'actions'
 
@@ -154,7 +151,7 @@ const emit = defineEmits<{
   edit: [item: T]
   deleteConfirmed: [item: T]
   'update:page': [page: number]
-  'update:itemsPerPage': [itemsPerPage: number]
+  'update:limit': [limit: number]
 }>()
 
 const headersWithoutActions = computed(() => {
@@ -190,29 +187,15 @@ const confirmDeleteAction = () => {
   }
 }
 
-const handleDeleteSuccess = () => {
-  if (props.items.length === 1 && props.page > 1) {
-    emit('update:page', props.page - 1)
-  }
-}
-
 const handlePageChange = (page: number) => {
   emit('update:page', page)
 }
 
 const handleItemsPerPageChange = (itemsPerPage: number) => {
-  emit('update:itemsPerPage', itemsPerPage)
+  emit('update:limit', itemsPerPage)
 }
 
 defineExpose({
-  showError: (message: string) => {
-    snackbarStore.showError(message)
-    errorMessage.value = message
-  },
-  showSuccess: (message: string) => {
-    snackbarStore.showSuccess(message)
-  },
-  handleDeleteSuccess,
   handleDeleteClick,
 })
 </script>

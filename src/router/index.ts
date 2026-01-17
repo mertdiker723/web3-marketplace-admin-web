@@ -13,6 +13,7 @@ const User = () => import('../views/user/index.vue')
 const UserForm = () => import('../views/userForm/index.vue')
 const Profile = () => import('../views/profile/index.vue')
 const Brand = () => import('../views/brand/index.vue')
+const Category = () => import('../views/category/index.vue')
 const NotFound = () => import('../views/notFound/index.vue')
 
 const routes = [
@@ -66,12 +67,20 @@ const routes = [
     },
   },
   {
+    path: '/category',
+    name: RouterEnum.CATEGORY,
+    component: Category,
+    meta: {
+      requiresAuth: true,
+      allowedRoles: [UserTypeEnum.SUPER_ADMIN],
+    },
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: RouterEnum.NOT_FOUND,
     component: NotFound,
     meta: {
       requiresAuth: false,
-      allowedRoles: [UserTypeEnum.SUPER_ADMIN],
     },
   },
 ]

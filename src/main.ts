@@ -18,6 +18,7 @@ import Button from './common/Button/index.vue'
 import TextArea from './common/TextArea/index.vue'
 import SelectBox from './common/SelectBox/index.vue'
 import Modal from './common/Modal/index.vue'
+import DataTable from './common/DataTable/index.vue'
 
 const vuetify = createVuetify({
   components,
@@ -31,6 +32,7 @@ app.component('button-field', Button)
 app.component('text-area', TextArea)
 app.component('select-box-field', SelectBox)
 app.component('modal-field', Modal)
+app.component('data-table', DataTable)
 
 app.use(vuetify)
 app.use(createPinia())

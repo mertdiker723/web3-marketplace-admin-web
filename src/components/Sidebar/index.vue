@@ -99,6 +99,13 @@ const allMenuItems = [
     to: { name: RouterEnum.BRAND },
     roles: [UserTypeEnum.SUPER_ADMIN],
   },
+  {
+    title: 'Categories',
+    value: RouterEnum.CATEGORY,
+    icon: 'mdi-folder-multiple',
+    to: { name: RouterEnum.CATEGORY },
+    roles: [UserTypeEnum.SUPER_ADMIN],
+  },
 ]
 
 const menuItems = computed(() => {
